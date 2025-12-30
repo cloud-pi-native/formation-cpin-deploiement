@@ -90,7 +90,7 @@ Comme la case ```Synchronisation automatique``` a été désactivée depuis la c
 
 ![ArgoCD refresh](./img/argocd-refresh.png)
 
-L'application est en erreur car différents éléments de configuration ne sont pas corrects
+L'application est en erreur car différents éléments de configuration ne sont pas corrects.
 
 ### Configuration de l'application
 
@@ -98,103 +98,38 @@ L'application n'est pas opéraitonnelle pour 2 raisons :
  - Les références à Harbor ne sont pas corrects
  - L'URL de déploiement de l'application n'est pas correcte.
 
-TODO
-Aller sur l'application ArgoCD correspondant à son déploiement : 
-
-
 L'application déployée n'est pas fonctionnelle, et certains éléments apparaissent sous la forme d'un petit coeur brisé.
 
 Il est possible de consulter les événements en erreur en cliquant sur le POD puis en allant sur l'onglet *EVENTS*. A noter qu'il est églament possible de consulter les logs des PODS sur l'onglet *LOGS* situé à côté. 
 
-En effet, un certain nombre d'éléments ne peuvent pas être déduite par avance lors de tutoriel :
- - Emplacement de l'image dans le repository *Harbor* car dépendant du nom du projet.
- - URL de déploiement qui est laissée libre au projet.
+Le fonctionnement standard de CPiN est de modifier le fichier values avec les bons paramètres depuis le repo externe sur Github puis de procéder à une synchronisation. pour des raisons de facilité (notamment pour éviter à tout le monde de modifier la source github), nous allons modifier directement le fichier values sur gitlab CPiN
 
-Le chart HELM utilisé prévoit déjà le paramétrage de ces éléments, ce qui doit être le cas de tous les charts HELM utilisés.
-
-### Ajouter un fichier values-tuto.yaml
-
-Pour des raisons de facilité, nous allons travailler à partir du repo de code de gitlab et non depuis la source, dans un mode projet, il conviendrait de travailler depuis le repo externe et de procéder à des synchronisation repo externe -> repo interne.
-
-1. Depuis Gitlab, aller dans le projet *demo-java-infra* et choisir la branche *tuto* puis sur le bouton *edit* -> *web IDE* créer un fichier values-tuto.yaml
+1. Depuis Gitlab, aller dans le projet *demo-java-infra* et choisir la branche *tuto* puis sur le bouton *edit* -> *web IDE* créer un fichier values-demo.yaml
 
 2. Ajouter le contenu suivant: 
 ```yaml
 image:
-  repository: harbor.formation.dso.numerique-interieur.com/form-tuto/java-demo
-  pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
+  repository: harbor.dso.formation.numerique-interieur.fr/form-tuto/java-demo
   tag: "tuto"
 
 ingress:
-  host: tuto.formation-app.cpin.numerique-interieur.com
-
-# Contrainte de sécurité Openshift
-postgresql:
-  image:
-    repository: bitnamilegacy/postgresql
-  primary:
-    containerSecurityContext:
-      enabled: true
-      privileged: false
-      allowPrivilegeEscalation: false
-      seccompProfile:
-        type: RuntimeDefault
-      capabilities:
-        drop:
-          - ALL
-      runAsNonRoot: true
-    podSecurityContext:
-      enabled: true
-  volumePermissions:
-    enabled: false
-    securityContext:
-      runAsUser: "1001"
-  securityContext:
-    enabled: true
-  shmVolume:
-    chmod:
-      enabled: false
-  containerSecurityContext:
-    enabled: true
-  podSecurityContext:
-    enabled: true
-    volumePermissions:
-      enabled: true
-      securityContext:
-        runAsUser: "1001"
-    securityContext:
-      enabled: true
-    shmVolume:
-      chmod:
-        enabled: false
-    containerSecurityContext:
-      enabled: true
-    podSecurityContext:
-      enabled: true
+  host: mon-appli.app.formation.numerique-interieur.fr
 
 ```
 
 Adapter le contenu en fonction de votre projet :
- - **image.repository** : correspond à l'emplacement de l'image construite dans le tuto précédent et deployer sur Harbor. Pour connaitre l'emplacement, depuis la console, aller sur le menu *Tableau de bord* de son projet puis cliquez sur le bouton *Afficher les secrets des services* dans le bloc *Harbor* est précisé la racine de déploiement des images du projet, par exemple *harbor.apps.dso.numerique-interieur.com/mi-service-team/*. Attention, lors de la modification de conserver le nom de l'image construite (/java-demo) dans l'URL du repo par exemple harbor.formation.cpin.numerique-interieur.com/test-prj/**java-demo**
- - **image.pullPolicy** : Correspond à la politique de téléchargement de l'image lors du déploiement, laisser à la valeur "Always" pour être sûr de récupérer toujours la dernière version de l'image. En mode projet, une politique de tag immutable est fortement conseillée et donc la politique de déploiement pourra passer à *IfNotPresent*. Dans le cadre de ce tuto, laisser *Always*
+ - **image.repository** : correspond à l'emplacement de l'image construite dans le tuto précédent et deployée sur Harbor. Pour connaitre l'emplacement, depuis la console, aller sur le menu *Tableau de bord* de son projet puis cliquez sur le bouton *Afficher les secrets des services* dans le bloc *Harbor* est précisé la racine de déploiement des images du projet, par exemple *harbor.dso.formation.numerique-interieur.fr/stform/*. Attention, lors de la modification de conserver le nom de l'image construite (/java-demo) dans l'URL du repo par exemple harbor.dso.formation.numerique-interieur.fr/stform/**java-demo**
  - **tag**: tag de l'image associé à **image.repository**, pour le tuto mettre *tuto*
- - **ingress.host** : Nom DNS de l'application. Sur l'environnement d'accélération, la génération des DNS et des certiifcats est automatiquement géré en respectant les sous domaines liés aux clusters. La documentation présente ce point [ici](https://gitlab.formation.cpin.numerique-interieur.com/forge-mi/projects/documentation/documentation-pax/-/blob/main/specificite-public-cloud.md?ref_type=heads). Pour le tutoriel, mettre un nom de la forme <NOM_APPLI>.formation-app.cpin.numerique-interieur.com /!\ Attention /!\  ce nom doit être unique.
-
-> Le bloc postgres est à ajouter en l'état pour permettre un déploiement de postgres sur un cluster kubernetes "sécurisé en mode openshift" ce qui est le cas pour l'environnement Scaleway.
+ - **ingress.host** : Nom DNS de l'application. Sur l'environnement d'accélération, la génération des DNS et des certiifcats est automatiquement géré en respectant les sous domaines liés aux clusters. La documentation présente ce point [ici](https://github.com/cloud-pi-native/documentation-pax/blob/main/specificite-public-cloud.md?ref_type=heads). Pour le tutoriel, mettre un nom de la forme <NOM_APPLI>.app.formation.numerique-interieur.fr /!\ Attention /!\  ce nom doit être unique.
 
 
-Une fois que ce fichier est créé et commit / push sur le repos git de gitlab, retourner sur argoCD sur son application et cliquez sur le bouton *REFRESH* pour voir apparaitre le message de commit correspondant à la modification ci-dessus.
+Une fois que ce fichier est créé et commit / push sur le repos git de gitlab, retourner sur la console CPiN et aller sur le repo d'infrastructure dans la partie *Fichiers values (Helm)* ajouter une ligne en desous de values-scw.yaml nommée *values-demo.yaml* et correspondant au fichier que l'on vient de créer.
 
-Nous allons maintenant configurer ArgoCD pour utiliser le fichier values-tuto.yaml
-
-Cliquez sur "Details", puis sur l'écran qui apparait, choisir l'onglet *PARAMETERS* cliquez sur le bouton *EDIT* puis dans values files choisir par autocomplétion le fichier values-tuto.yaml.
-
-Sauvegarder et fermer cette fenêtre de configuration pour revenir à l'écran de l'application ArgoCD. Vérifier que le déploiement s'effectue correctement (tout les éléments doivent passer en vert), cela peut prendre quelques secondes.
+Aller ensuite sur ArgoCD sur son application et cliquez sur le bouton *REFRESH* pour voir appliquer les modifications.
 
 ### Vérification
 
-Une fois le déploiement terminé et opérationnel, ouvrir un navigateur et vérifier votre l'URL que vous avez saisie dans le fichier *values-tuto.yaml* sur la clé **ingress.host** https://<NOM_APPLI>.formation-app.cpin.numerique-interieur.com/api/demo/demo
+Une fois le déploiement terminé et opérationnel, ouvrir un navigateur et vérifier votre l'URL que vous avez saisie dans le fichier *values-tuto.yaml* sur la clé **ingress.host** https://<NOM_APPLI>.app.formation.numerique-interieur.fr/api/demo/demo
 
 Il est également possible, depuis ArgoCD de cliquer sur la 3ème icone de l'objet Ingress qui ouvre directement une nouvelle page sur l'URL de l'application.
 
@@ -227,164 +162,3 @@ Si tout est correctement configuré, vous devez avoir une liste au format JSON c
 
 > Bravo vous avez terminé le tutoriel de déploiement !
 
-Nous allons maintenant voir la gestion des secrets
-
-## Gestion des secrets
-
-Dans l'exemple de déploiement, les secrets sont présents "*en clair*" dans un objet Secret. Ce fichier est dans templates/secret.yaml
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pg-secret
-type: Opaque
-data:
-  PG_PASSWORD: TXlTdXBFclBhU1N3T3Jk
-  PG_ROOT_PASSWORD: TXlTdXBFclBhU1N3T3Jk
-```
-
-Il est possible de décoder facilement la valeur de ces secrets car ils sont encodé en base64 :
-
-```bash
-$ echo TXlTdXBFclBhU1N3T3Jk | base64 -d
-MySupErPaSSwOrd
-```
-
-Cette pratique ne convient pas à une utilisation en production avec des vrais mots de passe. Ainsi, l'offre Cloud Pi Native propose d"utiliser la solution de chiffrement asymétrique [SOPS](https://github.com/getsops/sops) pour chiffrer les secrets. Le principe est que chaque cluster Cloud Pi Native possèdent sa paire de clé privée / publique. le projet chiffre ses secrets en utilisant la clé publique du cluster et lorsque les fichiers chiffrés sont déployés, le cluster les déchiffre car il connait la clé privée associée.
-
-Pour cela nous allons avoir besoin de l'utilitaire [AGE](https://github.com/FiloSottile/age/releases)
-
-De la documentation complémentaire est présente sur le [repo d'exemple](https://github.com/cloud-pi-native/exemples_ServiceTeam/tree/main/secrets/sops) ou sur la documentation [Cloud Pi Native](https://cloud-pi-native.fr/guide/secrets-management)
-
-### Récupération de la clé publique
-
-La clé publique des différents clusters est présente dans la console Cloud Pi dans les informations du cluster.
-
-Récupérer la clé publique du cluster de formation (age1qt7e329qjlhqsfsyxsvws56ukp2f9h0ktmj45atleqk0q406mfhstwnudv) sur SCW
-
-### Création d'un fichier de secret
-
-Créer un fichier sur son poste, nommé *secret.yaml* dont le contenu est le suivant :
-
-```yaml
-apiVersion: isindir.github.com/v1alpha3
-kind: SopsSecret
-metadata:
-  name: tuto-sops-secret
-spec:
-  secretTemplates:
-    - name: pg-secret-sops
-      stringData:
-        PG_PASSWORD: MySupErPaSSwOrd
-        PG_ROOT_PASSWORD: MySupErPaSSwOrd
-```
-Comme on peut le voir on crée un objet de type SopsSecret et non plus Secret dans le champ *kind*
-
-Lancer la commande suivante pour un déploiement sur Scaleway formation :
-
-```bash
-sops -e --age age1qt7e329qjlhqsfsyxsvws56ukp2f9h0ktmj45atleqk0q406mfhstwnudv --encrypted-suffix Templates secret.yaml > secret.enc.yaml
-```
-
-
-Cette commande va chiffrer le contenu des clés dont le suffix est Templates avec la clé public passée en paramètre et l'écrire dans un fichier *secret.enc.yaml* Il est important de conserver l'extension du fichier donc "*.enc.yaml*" et pas "*.yaml.enc*" car SOPS se base sur cette extension pour déterminer le contenu du fichier.
-
-Le contenu du fichier *secret.enc.yaml* est le suivant :
-
-```yaml
-apiVersion: isindir.github.com/v1alpha3
-kind: SopsSecret
-metadata:
-    name: tuto-sops-secret
-spec:
-    secretTemplates:
-        - name: ENC[AES256_GCM,data:o1j2+TbiOhCyHuEfyBQ=,iv:ojK6VrN0DAu/ZhijXo5u2ighYP/+8/qWFfW2LMKHFQ0=,tag:IFcB+WaIb0pcZydt1ZYldA==,type:str]
-          stringData:
-            PG_PASSWORD: ENC[AES256_GCM,data:3R8RJzIGf549Q0EUPhg/,iv:4O2i99sb13Dynv20G/SVxJBTZ9HoSPbkLQp1XMxP2Vc=,tag:Wbu4+jESe+lZ+L5VN3OhWQ==,type:str]
-            PG_ROOT_PASSWORD: ENC[AES256_GCM,data:/JGwlXwWiMF3eFY8InBF,iv:yh9e6uQAikBm+Xs0gleyxSZZ+Oi+v/8ax1J+T51MRnU=,tag:8TFLJyiQH7+0yP/m/hzIUg==,type:str]
-sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
-    age:
-        - recipient: age19tfqxgdgx3fe96j8fyy0c65nsfj8ku8sl4ccfxnzpn3xpakylg5s8sgac7
-          enc: |
-            -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3UmpTQ2FxQ3F4KzRIM0oy
-            Q2p1MlFIR25tdlRhZ05TMTc2ZEJmamxTdGw4CkM0NkFRODFHdGNiMU1vYUdUbWlv
-            M1VqSytIQXd0T1ZUdllDaXNlbU5RdncKLS0tIG9HZXoxMEo2eFYzVVBFQ2NuRnZ4
-            aTlHR1FPZ2JrRDJDS25sUjFLMmh1VmsKbgYx2nnTXRLj6TIT2B4vAQUAgAnakWGB
-            qJYKj6+Vv4N2lfBek9to2VKNv7n9gIa4KaxKWZlk+73hwoi6Z6/ozA==
-            -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-01-27T14:33:22Z"
-    mac: ENC[AES256_GCM,data:Yva1sZYkxUD7D9h6DXpb4Ks8SseNp1gUrSKwsaTo2yvoghLfiJCW0fOdRReCVS3SgwqWi2LwjFGihEsHYFclzBqhGjkOX/zNoWkg5QENZ/5DqlJFlEwkeCNJbF+85T+vIJrP8OQ0qN/3i5Wt4qbOZW0mEhZpRRPlgTPwaJqT+Fw=,iv:rGnChbKV0BHpPpTiB7/MbS3nY24gA/sUAY0aLy4TsFI=,tag:cY2OAfn/A3a0jIYYDcMjhA==,type:str]
-    pgp: []
-    encrypted_suffix: Templates
-    version: 3.8.1
-```
-
-Comme on peut le voir le contenu du fichier de secret est chiffré : 
-```yaml
-  PG_PASSWORD: ENC[AES256_GCM,data:3R8RJzIGf549Q0EUPhg/,iv:4O2i99sb13Dynv20G/SVxJBTZ9HoSPbkLQp1XMxP2Vc=,tag:Wbu4+jESe+lZ+L5VN3OhWQ==,type:str]
-  PG_ROOT_PASSWORD: ENC[AES256_GCM,data:/JGwlXwWiMF3eFY8InBF,iv:yh9e6uQAikBm+Xs0gleyxSZZ+Oi+v/8ax1J+T51MRnU=,tag:8TFLJyiQH7+0yP/m/hzIUg==,type:str]
-```
-
-> Le fichier *secret.yaml* **ne doit pas être commité / push** sur le repo git alors que le fichier *secret.enc.yaml* peut l'être.
-
-Créer un fichier  *secret.enc.yaml* dans le répertoire *templates* du repo d'infra et copier / coller le contenu du fichier que vous avez créé en local puis redéployez, puis depuis ArgoCD faite un refresh / sync afin d'actualiser le contenu des éléments déployés. Vous devriez voir l'objet SopsSecret de créé et un objet Secret associé. Vous pouvez consulter le contenu du secret depuis ArgoCD en cliquant sur l'objet secret vous devriez voir le contenu suivant :
-```YAML
-apiVersion: v1
-data:
-  PG_PASSWORD: ++++++++
-  PG_ROOT_PASSWORD: ++++++++
-kind: Secret
-metadata:
-  creationTimestamp: '2025-01-27T15:20:15Z'
-  name: pg-secret-sops
-  namespace: bmgxew1qioi64pw69t3uzmefy--eckznliru9ii2xkqnlwa7lbu0
-  ownerReferences:
-    - apiVersion: isindir.github.com/v1alpha3
-      blockOwnerDeletion: true
-      controller: true
-      kind: SopsSecret
-      name: tuto-sops-secret
-      uid: 07f6095c-9e2a-4540-9ecc-046908b58827
-  resourceVersion: '298243071'
-  uid: ace1ca76-f82f-4c5c-8e04-db79760da941
-type: Opaque
-```
-
-Les valeurs du secret ne sont pas directement accessibles et sont remplacés par des caractères '+'.
-
-Afin de ne pas entrer en collision avec l'objet Secret *pg-secret* déjà existant, le nom du secret que nous avons créé est *pg-secret-sops* et 2 secrets sont maintenant présents sur le projet :
- - **pg-secret** : le premier secret qui est commité en base64
- - **pg-secret-sops** : le secret chiffré via SOPS
-
- Afin d'utiliser le secret **pg-secret-sops** plutot que **pg-secret**, depuis Gitlab modifiez le fichier deployment.yaml pour changer le nom du secret de *pg-secret* à *pg-secret-sops* :
-```yaml
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: pg-secret-sops
-                  key: PG_PASSWORD
-```
-De même le secret **pg-secret** est référencé par postgres dans le fichier values.yaml du chart helm :
-```yaml
-[...]
-global:
-  postgresql:
-    auth:
-      existingSecret: pg-secret
-[...]
-```
-
-Il convient de modifier cette valeur par  **pg-secret-sops** ou de surcharger la clé global.postgresql.auth.existingSecret dans le fichier values-tuto.yaml
-
-Depuis ArgoCD faite un refresh / sync afin d'actualiser le contenu des éléments déployés, vous devriez voir le POD applicatif être supprimé puis recréé pour utiliser le bon secret.
-
-Vous pouvez maintenant supprimer le fichier **secret.yaml** du repo gitlab puis commit / push pour ne laisser que le fichier secret.enc.yaml car il n'est plus référencé. Sous argoCD refaite un refresh / sync pour vérifier que l'objet secret pg-secret a bien été supprimé et que le projet continue de fonctionner.
-
-> Bravo ! Vous savez maintenant comment gérer les secrets via SOPS dans CPiN !
-
-Ceci est la fin du tutoriel de déploiement.
