@@ -129,7 +129,7 @@ Aller ensuite sur ArgoCD sur son application et cliquez sur le bouton *REFRESH* 
 
 ### Vérification
 
-Une fois le déploiement terminé et opérationnel, ouvrir un navigateur et vérifier votre l'URL que vous avez saisie dans le fichier *values-tuto.yaml* sur la clé **ingress.host** https://<NOM_APPLI>.app.formation.numerique-interieur.fr/api/demo/demo
+Une fois le déploiement terminé et opérationnel, ouvrir un navigateur et vérifier votre l'URL que vous avez saisie dans le fichier *values-demo.yaml* sur la clé **ingress.host** https://<NOM_APPLI>.app.formation.numerique-interieur.fr/api/demo/demo
 
 Il est également possible, depuis ArgoCD de cliquer sur la 3ème icone de l'objet Ingress qui ouvre directement une nouvelle page sur l'URL de l'application.
 
