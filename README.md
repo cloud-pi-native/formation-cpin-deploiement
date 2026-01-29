@@ -1,139 +1,236 @@
-# Chart Helm de démonstration DSO
+# Chart Helm de démonstration sur Cloud Pi Native
+
+Vous en êtes à l'étape 4 de la formation CPiN :
+1. [Gestion des projets CPiN](https://github.com/cloud-pi-native/formation-cpin-gestion-projet)
+2. [Application d'exemple pour déploiement sur CPiN](https://github.com/cloud-pi-native/formation-cpin-repo-applicatif)
+3. [Gestion des artefacts sur CPiN](https://github.com/cloud-pi-native/formation-cpin-harbor-trivy)
+4. ➡️ [Chart Helm de démonstration sur CPiN](https://github.com/cloud-pi-native/formation-cpin-deploiement)
+5. [Gestion des secrets sur CPIN](https://github.com/cloud-pi-native/formation-cpin-gestion-secret)
+6. [Observabilité sur CPiN](https://github.com/cloud-pi-native/formation-cpin-observabilite)
 
 ## Présentation
 
-Ce tutoriel permet de déployer l'application qui a été construite lors du tutoriel [https://github.com/cloud-pi-native/formation-cpin-repo-applicatif](https://github.com/cloud-pi-native/formation-cpin-repo-applicatif)
+> [!IMPORTANT]
+> Il est nécessaire d'avoir construit au préalable l'image *java-demo* détaillée dans le tutoriel :
+> [https://github.com/cloud-pi-native/formation-cpin-repo-applicatif](https://github.com/cloud-pi-native/formation-cpin-repo-applicatif).
+> Il est indispensable d'avoir terminé ce tutoriel avant de poursuivre.
 
-Le déploiement d'un applicatif sur CPiN passe par la création d'un repo de code applicatif contenant les éléments d'infrastructure Kubernetes et/ou Openshift (manifest yaml, chart HELM ou Kustomize). Dans cet exemple, le code d'infrastructure est un chart HELM qui déploie l'image tuto-java créé précédemment.
+Le déploiement d'un applicatif sur CPiN passe par la création d'un dépôt de code applicatif contenant les éléments 
+d'infrastructure Kubernetes et/ou Openshift (manifest yaml, chart HELM ou Kustomize). Dans cet exemple, le code 
+d'infrastructure est un chart HELM qui déploie l'image ***java-demo*** créé précédemment.
 
-
-Ce chart permet de créer :
- - Appel au chart HELM par déclaration de dépendance pour la création d'une instance PosgreSQL / Bitnami
- - Création d'un déploiement de l'image construite lors du TP précédent.
- - Création d'un service sur le déploiement
- - Création d'un ingress en https vers le service
-
-> Il est nécessaire d'avoir construit au préalable l'image tuto-java détaillée dans le tutoriel : [https://github.com/cloud-pi-native/formation-cpin-repo-applicatif](https://github.com/cloud-pi-native/formation-cpin-repo-applicatif). Il est indispensable d'avoir terminé ce tutoriel avant de poursuivre ce tutoriel.
+Ce chart permet de :
+ - Faire appel au chart HELM de création d'instance PosgreSQL / Bitnami par déclaration de dépendance
+ - Créer un déploiement de l'image construite lors du TP précédent
+ - Créer un service sur le déploiement
+ - Créer un ingress en https vers le service
 
 ## Intégration à la chaine CPiN
 
 ### Ajout du dépôt externe
 
-Nous allons détailler l'intégration du repo d'infra de démo à l'offre Cloud Pi Native sur la plateforme d'accéleration.
+Nous allons détailler l'intégration du dépôt d'infra de démo à l'offre Cloud Pi Native sur la plateforme d'accéleration.
 
-Dans un premier temps il est nécessaire d'ajouter le *repo de code* d'infrastructure au projet contenant la construction de l'applicatoin tuto-java :
+Dans un premier temps, il est nécessaire d'ajouter le **dépôt de code d'infrastructure** au projet contenant la 
+construction de l'application *java-demo* :
 
-1. Depuis son *projet*, aller dans l'onglet *Dépôt*, puis *ajouter un nouveau dépôt* :
+▶️ Depuis votre *projet*, allez dans l'onglet `Dépôt`, puis `+ Ajouter un nouveau dépôt` :
 
- - *Nom du dépôt Git interne* : demo-java-infra
+▶️ Ajoutez un dépôt avec les paramètres suivants :
+- `Nom du dépôt Git interne` : **demo-java-infra**
+- `Dépôt contenant du code d'infrastructure` : **cochez la case**
+- `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/tuto-java-infra-helm.git**
+- `Nom de la révision à déployer` : **tuto**
+- `Chemin du répertoire à déployer` : **./**
+- `Fichiers values` : **values-scw.yaml**
 
-Le repo contient du code d'infrastructure donc cochez la case *Dépôt contenant du code d'infrastructure*.
+Les éléments de la section *Déploiement* servent à piloter la configuration d'ArgoCD.
 
-2. Renseigner *l'URL du repo externe* [https://github.com/cloud-pi-native/tuto-java-infra-helm.git](https://github.com/cloud-pi-native/tuto-java-infra-helm.git). Le repo est public, laissez donc décoché la case *Dépôt de source privé*
+> [!TIP]
+> Dans le champ des fichiers *values*, il est possible d'utiliser un template avec le mot-clef `<env>`. Vous pouvez
+> l'utiliser par exemple pour facilement déclarer l'utilisation d'un fichier *values-dev.yaml* pour l'environnement de 
+> dev et *values-integ.yaml* pour l'environnement d'intégration. 
 
-Compléter les éléments suivants qui permettent de piloter la configuration d'ArgoCD : 
- - Nom de la branche du repo a utiliser pour le déploiement (par défaut HEAD), préciser ```tuto```
- - Chemin dans le repo pour arriver à la racine du déploiement, préciser ```./```
- - fichiers values à ajouter au chart. Par defaut, values.yaml. Il est possible de faire un template avec ```<env>``` pour utiliser par exemple values-dev.yaml sur l'environnement de dev et values-integ.yaml pour l'environnement d'intégration. Dans le cadre du tuto, mettre ```values-scw.yaml```
+▶️ Cliquez sur le bouton `Ajouter le dépôt` et attendez que le dépôt apparaisse dans la console CPiN.
 
-Cliquez sur le bouton *Ajouter le dépôt* et attendre que le dépôt apparaisse dans la console.
-
-3. depuis l'onglet *Services externes* vérifier en cliquant sur le service Gitlab que le dépôt *demo-java-infra* est bien présent dans ses projets gitlab.
+▶️ Depuis l'onglet `Services externes`, vérifiez en cliquant sur le service Gitlab que le dépôt *demo-java-infra* est 
+bien présent dans vos projets gitlab.
 
 ### Création d'un environnement
 
-Afin de déployer l'application, il est nécessaire de créer un environnement depuis la console. Pour cela, aller dans le menu *Environnements* puis cliquez sur le bouton "+Ajouter un nouvel environnement" :
- - Nom : Donnez un nom logique à l'environnement : demo, dev, integ, prd, etc. Il est conseillé de choisir des noms cours car le nom est utilisé dans les objets Kubernetes créés or ceux-ci sont limité à 63 caractère au total. Pour le tutoriel, choisir *tuto*
- - Choisir une zone : sur l'environnement d'accélération, une seule zone est disponible: *Zone défaut*.
- - Type d'environnement: choisir *dev*. Le choix d'un type d'environnement permet de filtre les dimmensionnements proposés
- - Dimensionnement: choisir *small*. le dimensionnement appose un quota de ressource sur le namespace correspondant au projet.
- - Cluster : choisir le cluster *formation-app* (ce cluster est dédié aux exercices et peut être facilement purgé)
+Afin de déployer l'application, il est nécessaire de créer un environnement depuis la console CPiN.
 
-Décocher la case ```Synchronisation automatique``` afin d'éviter de commencer à déployer le projet tant qu'il n'est pas complètement configuré.
+▶️ Pour cela, allez dans l'onglet' `Ressources` puis dans le menu `Environnements`. Cliquez sur le bouton 
+`+ Ajouter un nouvel environnement`. Utilisez les paramètres suivants :
+ - `Nom de l'environnement` : **tuto**
+ - `Zone` : **DSO** (sur l'environnement d'accélération, une seule zone est disponible)
+ - `Type d'environnement` : **dev**
+ - `Cluster` : **formation-app** (ce cluster est dédié aux exercices et peut être facilement purgé)
+ - `Mémoire allouée` : 8
+ - `CPU alloué` : 4
+ - `GPU alloué` : 0
+ - `Synchronisation automatique` : **décochez la case** (permet d'éviter de commencer à déployer le projet tant qu'il 
+n'est pas complètement configuré)
 
-Cliquez sur le bouton *Ajouter l'environnement* et attendre que l'environnement soir créé dans la console et apparaisse dans la liste des environnements de son projet.
+> [!IMPORTANT]
+> Pour vos futurs environnements, donnez-leur un nom logique (demo, dev, integ, prd, etc). Il est conseillé de choisir 
+> des noms cours, car ce nom est réutilisé dans les objets Kubernetes dont le nom qui sont limité à 63 caractères.
+
+> [!IMPORTANT]
+> Le choix d'un type d'environnement permet de filtrer les dimensionnements proposés. Pour rappel, nous avions défini à 
+> la création du projet, dans l'étape 1 de la formation, des valeurs de dimensionnement pour les environnements de
+> *hors-production* et de *production*.
+
+▶️ Cliquez sur le bouton `Ajouter l'environnement` et attendre que l'environnement apparaisse dans la console CPiN.
 
 ## Déploiement de l'application
 
-Lorsqu'un projet contient un repo d'infrastructure et (au moins) un environnement, la console crée automatiquement les applications *ArgoCD* associées. Ainsi, depuis le menu gauche  *Services externes* cliquez sur la tuile *ArgoCD DSO* puis le bouton *login via Keycloak* et vérifier que vous retrouvez votre application et cliquez sur la tuile correspondant à votre application. L'application apparait en erreur, c'est normal à ce stade et nous allons corriger les différents points.
+Lorsqu'un projet contient un repo d'infrastructure et (au moins) un environnement, la console CPiN crée automatiquement 
+les applications *ArgoCD* associées.
 
-
-### ArgoCD
-
-Depuis la console CPiN aller sur la tuile ArgoCD
+▶️ Depuis le menu `Services externes`, cliquez sur la tuile *ArgoCD DSO*. Authentifiez-vous en appuyant sur le bouton 
+*login via Keycloak*.
 
 ![ArgoCD](./img/services-externes-argocd.png)
 
-Une fois connecté à ArgoCD, plusieurs applications sont visibles, par exemple pour le projet **stform**, l'envrionnement **demo** et le repo **infra** : 
+> [!NOTE]
+> Par défaut, en accédant à ArgoCD depuis la console CPiN, un filtre sur le nom de votre application est déjà appliqué. 
+> Celle-ci peut mettre quelques minutes à s'afficher le temps qu'elle soit créée.
+
+### ArgoCD
+
+Une fois connecté à ArgoCD, deux applications sont visibles. Elles correspondent à votre infrastructure et votre stack 
+d'observabilité. Vous devriez donc retrouver les deux applications suivantes :
+- ***[nom d'app]-tuto-[id]-demo-java-infra*** : application ArgoCD du dépôt infra que l'on a déclaré depuis la console 
+CPiN, c'est le déploiement de notre application
+- ***hprod-[nom d'app]-observability*** : dashboards as code (sera abordé dans le tuto sur l'observabilité à l'étape 6)
+
+> [!NOTE]
+> Une autre application nommée *"prod-[nom_projet]-observability"* peut également être présente si au moins un 
+> environnement de type production est déployé.
 
 ![ArgoCD](./img/applis-argocd.png)
 
-Voici les différentes application ArgoCD présentes :
- - hprod-stform-observability : Cette application correspond au déploiement des dashboard as code (voir le tuto sur l'observabilité). Une autre application nommée "prod" et non "hprod-[nom_projet]-observability" peut également être présente si au moins un environnement de type production est déployé. 
- - stform-demo-[id]-env : Cette application ArgoCD correspond aux éléments d'infrastructure déployé au sein de son namespace : registry pull secret pour la récupération des images sur Harbor par exemple  (à ne pas modifier)
- - stform-formation-app-demo-root : App of apps permettant de piloter l'ensemble des applis de son projet (à ne pas modifier)
- - stform-demo-[id]-infra-[id] : correspond à l'application ArgoCD du repo infra que l'on déclaré depuis la console, c'est l'application correspondant à notre déploiement.
+L'application est créée avec les paramètres fournis par la console CPiN.
 
-L'application est créée avec les paramètres fournies par la console. Afin de vérifier ses paramètres, depuis l'application ArgoCD, choiusir son application de type stform-demo-[id]-infra-[id] puis cliquez sur le bouton *Details* en haut à gauche. Ce menu présente les informations principales de l'application ArgoCD :
+▶️ Afin de vérifier ses paramètres, choisissez votre application de type ***[nom d'app]-tuto-[id]-demo-java-infra*** 
+puis cliquez sur le bouton `Details` en haut à gauche. Ce menu présente les informations principales de l'application 
+ArgoCD :
 - Le cluster et le namespace de déploiement
-- Le repo Git associé (repo d'infrastructure)
-- La branche utilisée sur le repo
-- Le répertoire dans lequel chercher les éléments d'infrastructure.
+- Le dépôt Git associé (*REPO URL*)
+- La branche utilisée sur le dépôt (*TARGET REVISION*)
+- Le répertoire dans lequel chercher les éléments d'infrastructure (*PATH*)
 
-> Il n'est pas possible de modifier ces éléments depuis cette IHM ArgoCD. Pour modifier les éléments, il est nécessaire de modifier le repo de code depuis la console.
+> [!NOTE]
+> Il n'est pas possible de modifier ces éléments depuis cette IHM ArgoCD. Pour modifier les éléments, il est nécessaire 
+> de modifier le dépôt de code depuis la console CPiN.
 
-Les éléments à vérifier de façon générales sont : 
- - La branche utilisée, par defaut il s'agit de la branche principale du repo, mais il est possible suivant le cas de modifier cette branche. Par exemple, pour utiliser la branche develop ou dso du projet, il est nécessaire d'éditer cette information depuis la console pour remplacer *HEAD* par le nom de la branche à utiliser. Pour notre exemple, utilisez la branche tuto.
- - Le répertoire dans lequel chercher les éléments d'infrastructure : Par defaut, la console prépositionne un répertoire *./* à la racine du projet. Si ce n'est pas le cas il est possible d'éditer cette information pour remplacer le nom du répertoire contenant le code d'infrastructure.
+Les éléments à vérifier de façon générale sont : 
+ - La branche utilisée par défaut, il s'agit de la branche principale du dépôt, mais il est possible suivant le cas de 
+modifier cette branche. Il est courant d'utiliser la branche develop ou dso du projet selon votre workflow Git. Il est 
+nécessaire d'éditer cette information depuis la console CPiN pour remplacer *HEAD* par le nom de la branche à utiliser 
+dans le champ ***Nom de la révision à déployer***. Dans notre exemple, nous utilisons la branche tuto.
+ - Le répertoire dans lequel chercher les éléments d'infrastructure : Par défaut, la console CPiN prépositionne un 
+répertoire *./* à la racine du projet. Si vous avez un fonctionnement différent, il faut également mettre à jour cette 
+information dans la console CPiN et remplacer la valeur du champ ***Chemin du répertoire à déployer***.
 
-Comme la case ```Synchronisation automatique``` a été désactivée depuis la console il est nécessaire de déployer l'application à la main. Pour cela, cliquez sur le bouton Refresh dans le menu haut pour déployer l'application. 
+Puisque nous avons décoché la case ```Synchronisation automatique``` depuis la console CPiN, l'application devrait 
+apparaitre dans un état *OutOfSync*.
 
-![ArgoCD refresh](./img/argocd-refresh.png)
+![ArgoCD OutOfSync](./img/argocd-outofsync.png)
 
-L'application est en erreur car différents éléments de configuration ne sont pas corrects.
+▶️ Il est nécessaire de déployer l'application à la main. Pour cela, cliquez sur le bouton `SYNC` dans le menu haut puis
+`SYNCHRONIZE` pour déployer l'application.
+
+![ArgoCD sync](./img/argocd-sync.png)
+
+> [!IMPORTANT]
+> Une fois que l'application est synchronisée, l'application devrait apparaitre en erreur. À ce stade, ce statut est 
+> attendu parce qu'il manque encore quelques éléments de configuration.
 
 ### Configuration de l'application
 
-L'application n'est pas opéraitonnelle pour 2 raisons : 
+L'application n'est pas opérationnelle pour 2 raisons : 
  - Les références à Harbor ne sont pas corrects
- - L'URL de déploiement de l'application n'est pas correcte.
+ - L'URL de déploiement de l'application n'est pas correcte
 
-L'application déployée n'est pas fonctionnelle, et certains éléments apparaissent sous la forme d'un petit coeur brisé.
+Avant de corriger ces informations, attardons-nous une minute sur la visualisation des détails de ces erreurs. 
+Les éléments en erreur apparaissent sous la forme d'un petit cœur brisé 💔.
 
-Il est possible de consulter les événements en erreur en cliquant sur le POD puis en allant sur l'onglet *EVENTS*. A noter qu'il est églament possible de consulter les logs des PODS sur l'onglet *LOGS* situé à côté. 
+▶️ Consultez les événements en cliquant votre application puis sur le *POD* en erreur. Un panneau avec les détails du 
+*POD* s'affiche, allez sur l'onglet `EVENTS`. À noter qu'il est également possible de consulter les logs des *PODS* sur 
+l'onglet `LOGS` situé à côté.
 
-Le fonctionnement standard de CPiN est de modifier le fichier values avec les bons paramètres depuis le repo externe sur Github puis de procéder à une synchronisation. pour des raisons de facilité (notamment pour éviter à tout le monde de modifier la source github), nous allons modifier directement le fichier values sur gitlab CPiN
+Pour corriger les erreurs, nous allons ajouter un fichier *values* avec les paramètres manquants dans le dépôt Git.
 
-1. Depuis Gitlab, aller dans le projet *demo-java-infra* et choisir la branche *tuto* puis sur le bouton *edit* -> *web IDE* créer un fichier values-demo.yaml
+> [!CAUTION]
+> Pour rappel, le fonctionnement standard de CPiN serait de faire nos modifications depuis le dépôt externe sur Github 
+> puis de procéder à une synchronisation via le pipeline de l'application *mirror*. Pour des raisons pratiques 
+> (notamment pour éviter à tout le monde de modifier la même source github), nous allons ajouter le fichier *values* 
+> directement dans votre dépôt gitlab CPiN.
 
-2. Ajouter le contenu suivant: 
+▶️ Depuis Gitlab, allez dans le projet `demo-java-infra` et vérifiez que vous êtes bien à la racine du projet et sur la 
+branche `tuto` en haut à gauche. Ensuite, cliquez sur le bouton `+`>`New file`. Appelez votre fichier 
+`values-demo.yaml`.
+
+▶️ Ajoutez le contenu suivant :
 ```yaml
 image:
-  repository: harbor.dso.formation.numerique-interieur.fr/form-tuto/java-demo
+  repository: harbor.dso.formation.numerique-interieur.fr/[MON_APPLICATION]/[MON_IMAGE]
   tag: "tuto"
 
 ingress:
-  host: mon-appli.app.formation.numerique-interieur.fr
-
+  host: [MON_APPLICATION].app.formation.numerique-interieur.fr
 ```
 
-Adapter le contenu en fonction de votre projet :
- - **image.repository** : correspond à l'emplacement de l'image construite dans le tuto précédent et deployée sur Harbor. Pour connaitre l'emplacement, depuis la console, aller sur le menu *Tableau de bord* de son projet puis cliquez sur le bouton *Afficher les secrets des services* dans le bloc *Harbor* est précisé la racine de déploiement des images du projet, par exemple *harbor.dso.formation.numerique-interieur.fr/stform/*. Attention, lors de la modification de conserver le nom de l'image construite (/java-demo) dans l'URL du repo par exemple harbor.dso.formation.numerique-interieur.fr/stform/**java-demo**
- - **tag**: tag de l'image associé à **image.repository**, pour le tuto mettre *tuto*
- - **ingress.host** : Nom DNS de l'application. Sur l'environnement d'accélération, la génération des DNS et des certiifcats est automatiquement géré en respectant les sous domaines liés aux clusters. La documentation présente ce point [ici](https://github.com/cloud-pi-native/documentation-pax/blob/main/specificite-public-cloud.md?ref_type=heads). Pour le tutoriel, mettre un nom de la forme <NOM_APPLI>.app.formation.numerique-interieur.fr /!\ Attention /!\  ce nom doit être unique.
+Il faut adapter le contenu du fichier avec les informations de votre projet :
+ - **image.repository** : correspond à l'emplacement sur Harbor de l'image construite dans le tuto précédent
+ - **tag**: tag de l'image sur Harbor
+ - **ingress.host** : Nom DNS de l'application
 
+▶️ Pour connaitre l'URL complète du dépôt de votre image à remplir dans **image.repository**, allez dans la console CPiN
+puis cliquez sur le bouton `Afficher les secrets des services`. Dans le bloc *Harbor*, vous allez retrouver la racine de 
+déploiement des images du projet sous le format suivant : 
+> *harbor.dso.formation.numerique-interieur.fr*/**NOM_DE_VOTRE_APPLICATION**/.
 
-Une fois que ce fichier est créé et commit / push sur le repos git de gitlab, retourner sur la console CPiN et aller sur le repo d'infrastructure dans la partie *Fichiers values (Helm)* ajouter une ligne en desous de values-scw.yaml nommée *values-demo.yaml* et correspondant au fichier que l'on vient de créer.
+▶️ Attention, pour que l'URL soit correcte, ajoutez le nom de l'image construite (**java-demo**) dans l'URL du repo qui 
+aura alors le format suivant :
+> *harbor.dso.formation.numerique-interieur.fr/NOM_DE_VOTRE_APPLICATION*/**java-demo**
 
-Aller ensuite sur ArgoCD sur son application et cliquez sur le bouton *REFRESH* pour voir appliquer les modifications.
+▶️ Pour connaitre le **tag** de votre image, allez sur Harbor depuis la console CPiN. Cliquez sur votre image Docker et 
+retrouvez le tag dans la colonne *Tags*. Ce tag correspond généralement au nom de votre branche de déploiement. Pour le 
+tutorial, mettez : ***tuto***.
+
+Enfin, sur l'environnement d'accélération, la génération des DNS et des certificats est automatiquement géré en 
+respectant les sous-domaines liés aux clusters. Pour plus d'informations, consultez la documentation [DNS et certificat](https://github.com/cloud-pi-native/documentation-pax/blob/main/specificite-public-cloud.md?ref_type=heads#dns-et-certificat).
+
+▶️ Définissez l'**ingress.host** en utilisant le nom de votre application et en respectant le format proposé dans le 
+fichier.
+
+> [!WARNING]
+> Attention, ce nom doit être unique.
+
+▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt Gitlab, retournez sur la console CPiN et allez 
+sur le repo d'infrastructure dans la partie *Fichiers values (Helm)*. Ajoutez une ligne en-desous de *values-scw.yaml* 
+avec le nom du fichier que nous venons de créer ***values-demo.yaml***.
+
+▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
+et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications.
+
+> [!TIP]
+> Pour activer la synchronisation automatique, vous pouvez le faire depuis la console CPiN dans les paramètres de 
+> votre environnement.
 
 ### Vérification
 
-Une fois le déploiement terminé et opérationnel, ouvrir un navigateur et vérifier votre l'URL que vous avez saisie dans le fichier *values-demo.yaml* sur la clé **ingress.host** https://<NOM_APPLI>.app.formation.numerique-interieur.fr/api/demo/demo
+Une fois le déploiement terminé et opérationnel, le status de votre application devrait apparaitre *Healthy* ainsi que
+tous les éléments de l'infrastructure 💚. Vous pouvez directement vous rendre sur l'URL configurée dans **ingress.host**
+mais vous pouvez également la retrouver sur ArgoCD via l'objet *ingress*.
 
-Il est également possible, depuis ArgoCD de cliquer sur la 3ème icone de l'objet Ingress qui ouvre directement une nouvelle page sur l'URL de l'application.
+![ArgoCD Ingress](./img/argocd-ingress.png)
 
-Si tout est correctement configuré, vous devez avoir une liste au format JSON contenant la liste des personnes présentes en base de données de l'application de tuto.
+Si tout est correctement configuré, la page devrait vous renvoyer la liste de personnes présentes dans la base de 
+données au format JSON.
 
 ```JSON
 [
@@ -160,5 +257,4 @@ Si tout est correctement configuré, vous devez avoir une liste au format JSON c
 ]
 ```
 
-> Bravo vous avez terminé le tutoriel de déploiement !
-
+Bravo, vous avez terminé la partie déploiement de la formation CPiN !
