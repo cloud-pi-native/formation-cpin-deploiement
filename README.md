@@ -101,7 +101,7 @@ les applications *ArgoCD* associées.
 
 Une fois connecté à ArgoCD, deux applications sont visibles. Elles correspondent à votre infrastructure et votre stack 
 d'observabilité. Vous devriez donc retrouver les deux applications suivantes :
-- ***[nom d'app]-tuto-[id]-demo-java-infra*** : application ArgoCD du dépôt infra que l'on a déclaré depuis la console 
+- ***[nom d'app]-tuto-[id]-demo-java-infra-[random]*** : application ArgoCD du dépôt infra que l'on a déclaré depuis la console 
 CPiN, c'est le déploiement de notre application
 - ***hprod-[nom d'app]-observability*** : dashboards as code (sera abordé dans le tuto sur l'observabilité à l'étape 6)
 
