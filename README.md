@@ -122,6 +122,12 @@ ArgoCD :
 - Le répertoire dans lequel chercher les éléments d'infrastructure (*PATH*)
 
 > [!NOTE]
+> Vous pouvez par exemple retrouver le namespace Kubernetes de votre application dans les détails de l'application dans
+> ArgoCD et vérifier que vous avez bien la même valeur dans les détails de votre environnement dans la console.
+
+![Namespace](./img/namespace-details.png)
+
+> [!NOTE]
 > Il n'est pas possible de modifier ces éléments depuis cette IHM ArgoCD. Pour modifier les éléments, il est nécessaire 
 > de modifier le dépôt de code depuis la console CPiN.
 
