@@ -258,3 +258,5 @@ données au format JSON.
 ```
 
 Bravo, vous avez terminé la partie déploiement de la formation CPiN !
+
+Vous pouvez passer à l'étape 5 : [Gestion des secrets sur CPIN](https://github.com/cloud-pi-native/formation-cpin-gestion-secret)
