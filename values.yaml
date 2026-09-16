@@ -22,13 +22,55 @@ ingress:
   enabled: true
   host: nom-projet.app.formation.numerique-interieur.fr
 
-resources: 
+resources:
   limits:
     memory: "512Mi"
-    cpu: "500m"  
+    cpu: "500m"
   requests:
     memory: "512Mi"
-    cpu: "100m"  
+    cpu: "100m"
+
+# L'image distroless:nonroot tourne déjà avec un utilisateur non privilégié.
+# On ne fixe volontairement pas runAsUser, pour rester compatible avec les plages
+# d'UID imposées par les clusters Openshift.
+podSecurityContext:
+  runAsNonRoot: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  # La JVM a besoin d'écrire dans /tmp (répertoire de travail de Tomcat).
+  readOnlyRootFilesystem: false
+  seccompProfile:
+    type: RuntimeDefault
+
+# L'application n'expose pas Actuator : les probes utilisent les endpoints applicatifs.
+# /api/demo/ ne consulte pas la base, /api/demo/demo la consulte.
+
+# Laisse à la JVM le temps de démarrer (jusqu'à 30 x 5s) avant les autres probes.
+startupProbe:
+  httpGet:
+    path: /api/demo/
+    port: http
+  periodSeconds: 5
+  failureThreshold: 30
+
+# Volontairement indépendante de PostgreSQL : une base indisponible ne doit pas
+# provoquer de redémarrages en boucle du conteneur applicatif.
+livenessProbe:
+  httpGet:
+    path: /api/demo/
+    port: http
+  periodSeconds: 10
+
+# Retire le pod du service tant qu'il ne peut pas servir de données.
+readinessProbe:
+  httpGet:
+    path: /api/demo/demo
+    port: http
+  periodSeconds: 10
 
 postgres:
   fullnameOverride: postgres
