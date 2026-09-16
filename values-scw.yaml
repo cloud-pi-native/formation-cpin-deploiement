@@ -7,14 +7,3 @@ image:
 ingress:
   host: nom-projet.app.formation.numerique-interieur.fr
 
-# Contrainte de sécurité Openshift
-postgres:
-  auth:
-    existingSecret: pg-secret
-    secretKeys:
-      passwordKey: "PG_PASSWORD"
-      userPasswordKey: "PG_PASSWORD"
-      adminPasswordKey: "PG_ROOT_PASSWORD"
-    username: "userdemo"
-    database: "userdemo"
-

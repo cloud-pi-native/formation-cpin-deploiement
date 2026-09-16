@@ -7,8 +7,8 @@ replicaCount: 1
 image:
   repository: harbor.dso.formation.numerique-interieur.fr/nom-projet/nom-image
   pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "master"
+  # Surcharge le tag de l'image, dont la valeur par défaut est l'appVersion du chart.
+  tag: "tuto"
 
 imagePullSecrets: 
   - name: "registry-pull-secret"
@@ -16,13 +16,10 @@ nameOverride: ""
 fullnameOverride: ""
 
 service:
-  type: ClusterIP
   port: 8080
 
 ingress:
   enabled: true
-  secret:
-    enabled: true
   host: nom-projet.app.formation.numerique-interieur.fr
 
 resources: 
@@ -37,6 +34,13 @@ postgres:
   fullnameOverride: postgres
 
   auth:
+    # Le mot de passe est fourni par le secret pg-secret (templates/secret.yaml),
+    # celui-là même que lit l'application dans son deployment.
+    existingSecret: pg-secret
+    secretKeys:
+      passwordKey: "PG_PASSWORD"
+      userPasswordKey: "PG_PASSWORD"
+      adminPasswordKey: "PG_ROOT_PASSWORD"
     username: "userdemo"
     database: "userdemo"
 

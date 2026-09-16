@@ -21,3 +21,7 @@
 .idea/
 *.tmproj
 .vscode/
+
+# Support de formation, inutile dans le package
+img/
+README.md
