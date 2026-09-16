@@ -39,8 +39,8 @@ construction de l'application *java-demo* :
 - `Dépôt contenant du code d'infrastructure` : **cochez la case**
 - `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/formation-cpin-deploiement.git**
 - `Nom de la révision à déployer` : **tuto**
-- `Chemin du répertoire à déployer` : **./**
-- `Fichiers values` : laissez le vide
+- `Chemin du répertoire à déployer` : **laissez le vide**
+- `Fichiers values` : **laissez le vide**
 
 Les éléments de la section *Déploiement* servent à piloter la configuration d'ArgoCD.
 
