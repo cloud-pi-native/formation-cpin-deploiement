@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: harbor.formation.cpin.numerique-interieur.com/mi-tuto/app-java-forge-dso-demo
+  repository: harbor.dso.formation.numerique-interieur.fr/nom-projet/nom-image
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "master"
@@ -23,7 +23,7 @@ ingress:
   enabled: true
   secret:
     enabled: true
-  host: plec-demo.dev.numerique-interieur.com
+  host: nom-projet.app.formation.numerique-interieur.fr
 
 resources: 
   limits:

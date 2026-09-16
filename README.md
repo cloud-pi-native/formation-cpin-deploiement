@@ -20,7 +20,7 @@ d'infrastructure Kubernetes et/ou Openshift (manifestes YAML, charts HELM ou Kus
 d'infrastructure est un chart HELM qui déploie l'image ***java-demo*** créée précédemment.
 
 Ce chart permet de :
-- Faire appel au chart HELM de création d'instance PostgreSQL / Bitnami par déclaration de dépendance
+- Créer une instance PostgreSQL en faisant appel à un chart dédié
 - Créer un déploiement de l'image construite lors du TP précédent
 - Créer un service sur le déploiement
 - Créer un ingress vers le service
