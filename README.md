@@ -1,10 +1,10 @@
-# Chart Helm de démonstration sur Cloud Pi Native
+# Chart HELM de démonstration sur Cloud Pi Native
 
 Vous en êtes à l'étape 4 de la formation CPiN :
 1. [Gestion des projets CPiN](https://github.com/cloud-pi-native/formation-cpin-gestion-projet)
 2. [Application d'exemple pour déploiement sur CPiN](https://github.com/cloud-pi-native/formation-cpin-repo-applicatif)
 3. [Gestion des artefacts sur CPiN](https://github.com/cloud-pi-native/formation-cpin-harbor-trivy)
-4. ➡️ [Chart Helm de démonstration sur CPiN](https://github.com/cloud-pi-native/formation-cpin-deploiement)
+4. ➡️ [Chart HELM de démonstration sur CPiN](https://github.com/cloud-pi-native/formation-cpin-deploiement)
 5. [Gestion des secrets sur CPiN](https://github.com/cloud-pi-native/formation-cpin-gestion-secret)
 6. [Observabilité sur CPiN](https://github.com/cloud-pi-native/formation-cpin-observabilite)
 
@@ -16,14 +16,14 @@ Vous en êtes à l'étape 4 de la formation CPiN :
 > Il est indispensable d'avoir terminé ce tutoriel avant de poursuivre.
 
 Le déploiement d'un applicatif sur CPiN passe par la création d'un dépôt de code applicatif contenant les éléments
-d'infrastructure Kubernetes et/ou Openshift (manifest YAML, chart HELM ou Kustomize). Dans cet exemple, le code
+d'infrastructure Kubernetes et/ou Openshift (manifestes YAML, charts HELM ou Kustomize). Dans cet exemple, le code
 d'infrastructure est un chart HELM qui déploie l'image ***java-demo*** créée précédemment.
 
 Ce chart permet de :
 - Faire appel au chart HELM de création d'instance PostgreSQL / Bitnami par déclaration de dépendance
 - Créer un déploiement de l'image construite lors du TP précédent
 - Créer un service sur le déploiement
-- Créer un ingress en https vers le service
+- Créer un ingress vers le service
 
 ## Intégration à la chaine CPiN
 
@@ -34,12 +34,10 @@ Nous allons détailler l'intégration du dépôt d'infra de démo à l'offre Clo
 Dans un premier temps, il est nécessaire d'ajouter le **dépôt de code d'infrastructure** au projet contenant la
 construction de l'application *java-demo* :
 
-▶️ Depuis votre *projet*, allez dans l'onglet `Dépôt`, puis `+ Ajouter un nouveau dépôt` :
-
-▶️ Ajoutez un dépôt avec les paramètres suivants :
+▶️ Depuis votre *projet*, allez dans l'onglet `Dépôt`, puis `+ Ajouter un nouveau dépôt`, puis utilisez les paramètres suivants :
 - `Nom du dépôt Git interne` : **demo-java-infra**
 - `Dépôt contenant du code d'infrastructure` : **cochez la case**
-- `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/tuto-java-infra-helm.git**
+- `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/formation-cpin-deploiement.git**
 - `Nom de la révision à déployer` : **tuto**
 - `Chemin du répertoire à déployer` : **./**
 - `Fichiers values` : **values-scw.yaml**
@@ -53,8 +51,8 @@ Les éléments de la section *Déploiement* servent à piloter la configuration 
 
 ▶️ Cliquez sur le bouton `Ajouter le dépôt` et attendez que le dépôt apparaisse dans la console CPiN.
 
-▶️ Depuis l'onglet `Services externes`, vérifiez en cliquant sur le service Gitlab que le dépôt *demo-java-infra* est
-bien présent dans vos projets gitlab.
+▶️ Depuis l'onglet `Services externes`, vérifiez en cliquant sur le service GitLab que le dépôt *demo-java-infra* est
+bien présent dans vos projets GitLab.
 
 ### Création d'un environnement
 
@@ -91,7 +89,7 @@ les applications *ArgoCD* associées.
 ▶️ Depuis le menu `Services externes`, cliquez sur la tuile *ArgoCD DSO*. Authentifiez-vous en appuyant sur le bouton
 *login via Keycloak*.
 
-![ArgoCD](./img/services-externes-argocd.png)
+![service externe ArgoCD](./img/services-externes-argocd.png)
 
 > [!NOTE]
 > Par défaut, en accédant à ArgoCD depuis la console CPiN, un filtre sur le nom de votre application est déjà appliqué.
@@ -99,8 +97,8 @@ les applications *ArgoCD* associées.
 
 ### ArgoCD
 
-Une fois connecté à ArgoCD, deux applications sont visibles. Elles correspondent à votre infrastructure et votre stack
-d'observabilité. Vous devriez donc retrouver les quatres applications suivantes :
+Une fois connecté à ArgoCD, 4 applications sont visibles. Elles correspondent à votre infrastructure et votre stack
+d'observabilité. Vous devriez donc retrouver les applications suivantes :
 - ***[NOM_PROJET]-formation-app-[NOM_ENV]-root*** : application chapeau de votre projet
 (e.g. monprojet-formation-app-tuto-root)
 - ***[NOM_PROJET]-[NOM_ENV]-[ID]-[NOM_DEPOT]-[RANDOM]*** : application ArgoCD du dépôt infra que l'on a déclaré
@@ -113,7 +111,7 @@ dans le tuto sur l'observabilité à l'étape 6
 > Une autre application nommée *"prod-[NOM_PROJET]-observability"* peut également être présente si au moins un
 > environnement de type production est déployé.
 
-![ArgoCD](./img/applis-argocd.png)
+![applications ArgoCD](./img/applis-argocd.png)
 
 L'application est créée avec les paramètres fournis par la console CPiN.
 
@@ -177,10 +175,10 @@ Pour corriger les erreurs, nous allons ajouter un fichier *values* avec les para
 > [!CAUTION]
 > Pour rappel, le fonctionnement standard de CPiN serait de faire nos modifications depuis le dépôt externe sur Github
 > puis de procéder à une synchronisation via le pipeline de l'application *mirror*. Pour des raisons pratiques
-> (notamment pour éviter à tout le monde de modifier la même source github), nous allons ajouter le fichier *values*
-> directement dans votre dépôt gitlab CPiN.
+> (notamment pour éviter à tout le monde de modifier la même source GitHub), nous allons ajouter le fichier *values*
+> directement dans votre dépôt GitLab CPiN.
 
-▶️ Depuis Gitlab, allez dans le projet `demo-java-infra` et vérifiez que vous êtes bien à la racine du projet et sur la
+▶️ Depuis GitLab, allez dans le projet `demo-java-infra` et vérifiez que vous êtes bien à la racine du projet et sur la
 branche `tuto` en haut à gauche. Ensuite, cliquez sur le bouton `+`>`New file`. Appelez votre fichier
 `values-demo.yaml`.
 
@@ -216,14 +214,14 @@ Enfin, sur l'environnement d'accélération, la génération des DNS et des cert
 respectant les sous-domaines liés aux clusters. Pour plus d'informations, consultez la documentation
 [DNS et certificat](https://github.com/cloud-pi-native/documentation-pax/blob/main/specificite-public-cloud.md).
 
-▶️ Définissez l'**ingress.host** en utilisant le nom de votre application et en respectant le format proposé dans le
+▶️ Définissez l'**ingress.host** en utilisant le nom de votre projet et en respectant le format proposé dans le
 fichier.
 
 > [!WARNING]
 > Attention, ce nom doit être unique.
 
-▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt Gitlab, retournez sur la console CPiN et allez
-sur le repo d'infrastructure dans la partie *Fichiers values (Helm)*. Ajoutez une ligne en dessous de *values-scw.yaml*
+▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt GitLab, retournez sur la console CPiN et allez
+sur le repo d'infrastructure dans la partie *Fichiers values (HELM)*. Ajoutez une ligne en dessous de *values-scw.yaml*
 avec le nom du fichier que nous venons de créer ***values-demo.yaml***.
 
 ▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
