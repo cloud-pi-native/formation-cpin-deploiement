@@ -1,9 +1,0 @@
-image:
-  repository: harbor.dso.formation.numerique-interieur.fr/nom-projet/nom-image
-  pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "tuto"
-
-ingress:
-  host: nom-projet.app.formation.numerique-interieur.fr
-

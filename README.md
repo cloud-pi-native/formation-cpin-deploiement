@@ -40,7 +40,7 @@ construction de l'application *java-demo* :
 - `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/formation-cpin-deploiement.git**
 - `Nom de la révision à déployer` : **tuto**
 - `Chemin du répertoire à déployer` : **./**
-- `Fichiers values` : **values-scw.yaml**
+- `Fichiers values` : laissez le vide
 
 Les éléments de la section *Déploiement* servent à piloter la configuration d'ArgoCD.
 
@@ -221,8 +221,8 @@ fichier.
 > Attention, ce nom doit être unique.
 
 ▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt GitLab, retournez sur la console CPiN et allez
-sur le repo d'infrastructure dans la partie *Fichiers values (HELM)*. Ajoutez une ligne en dessous de *values-scw.yaml*
-avec le nom du fichier que nous venons de créer ***values-demo.yaml***.
+sur le repo d'infrastructure dans la partie *Fichiers values (HELM)*. Ajoutez une ligne avec le nom du fichier que nous
+venons de créer ***values-demo.yaml***.
 
 ▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
 et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications.
