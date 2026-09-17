@@ -29,18 +29,20 @@ Ce chart permet de :
 
 ### Ajout du dépôt externe
 
-Nous allons détailler l'intégration du dépôt d'infra de démo à l'offre Cloud Pi Native sur la plateforme d'accélération.
+Nous allons détailler l'intégration du dépôt d'infra de démo à l'offre Cloud Pi Native sur la plateforme
+d'accélération.
 
 Dans un premier temps, il est nécessaire d'ajouter le **dépôt de code d'infrastructure** au projet contenant la
 construction de l'application *java-demo* :
 
-▶️ Depuis votre *projet*, allez dans l'onglet `Dépôt`, puis `+ Ajouter un nouveau dépôt`, puis utilisez les paramètres suivants :
+▶️ Depuis votre *projet*, allez dans l'onglet `Dépôt`, puis `+ Ajouter un nouveau dépôt`, puis utilisez les paramètres
+suivants :
 - `Nom du dépôt Git interne` : **demo-java-infra**
 - `Dépôt contenant du code d'infrastructure` : **cochez la case**
 - `Url du dépôt Git externe` : **https://github.com/cloud-pi-native/formation-cpin-deploiement.git**
 - `Nom de la révision à déployer` : **tuto**
-- `Chemin du répertoire à déployer` : **laissez le vide**
-- `Fichiers values` : **laissez le vide**
+- `Chemin du répertoire à déployer` : **laissez ce champ vide** (par défaut `./`)
+- `Fichiers values` : **laissez ce champ vide** (par défaut `values.yaml`)
 
 Les éléments de la section *Déploiement* servent à piloter la configuration d'ArgoCD.
 
@@ -83,8 +85,27 @@ n'est pas complètement configuré)
 
 ## Déploiement de l'application
 
-Lorsqu'un projet contient un repo d'infrastructure et (au moins) un environnement, la console CPiN crée automatiquement
-les applications *ArgoCD* associées.
+> [!NOTE]
+> Aujourd'hui, lorsqu'un projet contient un repo d'infrastructure et (au moins) un environnement, la console CPiN crée
+> automatiquement les applications *ArgoCD* associées. Les versions récentes de la console ont introduit la notion de
+> déploiement pour permettre de déployer un ou plusieurs dépôts d'infrastructure dans un environnement.
+
+### Création d'un déploiement
+
+Vous pouvez retrouver les déploiements dans l'onglet `Ressources` avec les dépôts et les environnements.
+
+![ajout nouveau déploiement](./img/ajout-deploiement.png)
+
+▶️ Cliquez sur `+ Ajouter un nouveau déploiement` et utilisez les paramètres suivants :
+- `Nom du déploiement` : **dev**
+- `Environnement cible` : **tuto** (ou le nom de votre environnement créé plus haut)
+- `Dépôt` : **demo-java-infra**
+- `Nom de la révision à déployer` : **tuto**
+- `Chemin du répertoire à déployer` : **laissez ce champ vide** (default `.`)
+
+▶️ Cliquez sur le bouton `Enregistrer` et attendez que le déploiement apparaisse dans la console.
+
+![déploiement créé](./img/deploiement-cree.png)
 
 ▶️ Depuis le menu `Services externes`, cliquez sur la tuile *ArgoCD DSO*. Authentifiez-vous en appuyant sur le bouton
 *login via Keycloak*.
@@ -103,19 +124,18 @@ d'observabilité. Vous devriez donc retrouver les applications suivantes :
 (e.g. monprojet-formation-app-tuto-root)
 - ***[NOM_PROJET]-[NOM_ENV]-[ID]-[NOM_DEPOT]-[RANDOM]*** : application ArgoCD du dépôt infra que l'on a déclaré
 depuis la console CPiN, c'est le déploiement de notre application (e.g. monprojet-tuto-4641-demo-java-infra-5d2c)
-- ***[NOM_PROJET]-[NOM_ENV]-[ID]-env*** : (e.g. monprojet-tuto-4641-env)
+- ***[NOM_PROJET]-[NOM_ENV]-[ID]-env*** : socle technique de l'environnement (namespace, quotas, secrets), créé par
+la console CPiN (e.g. monprojet-tuto-4641-env)
 - ***hprod-[NOM_PROJET]-observability*** : dashboards as code (e.g. hprod-monprojet-observability), il sera abordé
 dans le tuto sur l'observabilité à l'étape 6
+
+![applications ArgoCD](./img/argocd-applications.png)
 
 > [!NOTE]
 > Une autre application nommée *"prod-[NOM_PROJET]-observability"* peut également être présente si au moins un
 > environnement de type production est déployé.
 
-![applications ArgoCD](./img/applis-argocd.png)
-
-L'application est créée avec les paramètres fournis par la console CPiN.
-
-▶️ Afin de vérifier ses paramètres, choisissez votre application de type
+▶️ Afin de vérifier les paramètres de notre application, choisissez votre application de type
 ***[NOM_PROJET]-tuto-[ID]-demo-java-infra-[RANDOM]*** puis cliquez sur le bouton `Details` en haut à gauche. Ce menu
 présente les informations principales de l'application ArgoCD :
 - Le cluster et le namespace de déploiement
@@ -145,7 +165,7 @@ information dans la console CPiN et remplacer la valeur du champ ***Chemin du r�
 Puisque nous avons décoché la case `Synchronisation automatique` depuis la console CPiN, l'application devrait
 apparaitre dans un état *OutOfSync*.
 
-![ArgoCD OutOfSync](./img/argocd-outofsync.png)
+![ArgoCD OutOfSync](./img/argocd-out-of-sync.png)
 
 ▶️ Il est nécessaire de déployer l'application à la main. Pour cela, cliquez sur le bouton `SYNC` dans le menu haut puis
 `SYNCHRONIZE` pour déployer l'application.
@@ -197,8 +217,8 @@ Il faut adapter le contenu du fichier avec les informations de votre projet :
 - **tag**: tag de l'image sur Harbor
 - **ingress.host** : Nom DNS de l'application
 
-▶️ Pour connaitre l'URL complète du dépôt de votre image à remplir dans **image.repository**, allez dans la console CPiN
-puis cliquez sur le bouton `Afficher les secrets des services`. Dans le bloc *Harbor*, vous allez retrouver la
+▶️ Pour connaitre l'URL complète du dépôt de votre image à remplir dans **image.repository**, allez dans la console
+CPiN puis cliquez sur le bouton `Afficher les secrets des services`. Dans le bloc *Harbor*, vous allez retrouver la
 racine de déploiement des images du projet sous le format suivant :
 > *harbor.dso.formation.numerique-interieur.fr*/**[NOM_PROJET]**/.
 
@@ -220,16 +240,24 @@ fichier.
 > [!WARNING]
 > Attention, ce nom doit être unique.
 
-▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt GitLab, retournez sur la console CPiN et allez
-sur le repo d'infrastructure dans la partie *Fichiers values (HELM)*. Ajoutez une ligne avec le nom du fichier que nous
-venons de créer ***values-demo.yaml***.
+▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt GitLab, retournez sur la console CPiN et ouvrez
+votre déploiement dans l'onglet `Ressources`.
+
+▶️ Dans la section *Sources de valeurs (Helm)*, cliquez sur  `+ Ajouter une source de valeurs`.
+
+![ajout source de valeurs](./img/ajout-source-de-valeurs.png)
+
+▶️ Ajoutez le fichier values que nous venons de créer en sélectionnant le type `Interne` et en remplissant le champ
+`Chemin du fichier de valeurs` avec ***values-demo.yaml***. Cliquez sur `Enregistrer`.
 
 ▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
-et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications.
+et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications. Si votre application
+n'apparait pas dans l'état *OutOfSync*, patientez quelques secondes le temps que les paramètres de déploiement soient
+appliqués.
 
 > [!TIP]
-> Pour activer la synchronisation automatique, vous pouvez le faire depuis la console CPiN dans les paramètres de
-> votre environnement.
+> Pour activer la synchronisation automatique, vous pouvez aller dans les paramètres de votre environnement dans la
+> console.
 
 ### Vérification
 
