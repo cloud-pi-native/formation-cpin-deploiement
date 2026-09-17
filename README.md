@@ -44,12 +44,10 @@ suivants :
 - `Chemin du répertoire à déployer` : **laissez ce champ vide** (par défaut `./`)
 - `Fichiers values` : **laissez ce champ vide** (par défaut `values.yaml`)
 
-Les éléments de la section *Déploiement* servent à piloter la configuration d'ArgoCD.
-
-> [!TIP]
-> Dans le champ des fichiers *values*, il est possible d'utiliser un template avec le mot-clef `<env>`. Vous pouvez
-> l'utiliser par exemple pour facilement déclarer l'utilisation d'un fichier *values-dev.yaml* pour l'environnement de
-> dev et *values-integ.yaml* pour l'environnement d'intégration.
+> [!NOTE]
+> Dans les versions à venir de la console, les 3 derniers champs qui sont liés au déploiement vont devenir obsolètes
+> dans la définition d'un dépôt d'infrastructure. Vous pourrez retrouver ces champs dans un élément de configuration
+> dédié appelé `déploiement` que nous allons voir plus bas.
 
 ▶️ Cliquez sur le bouton `Ajouter le dépôt` et attendez que le dépôt apparaisse dans la console CPiN.
 
@@ -73,8 +71,8 @@ Afin de déployer l'application, il est nécessaire de créer un environnement d
 n'est pas complètement configuré)
 
 > [!IMPORTANT]
-> Pour vos futurs environnements, donnez-leur un nom logique (demo, dev, integ, prd, etc). Il est conseillé de choisir
-> des noms courts, car ce nom est réutilisé dans les objets Kubernetes dont les noms sont limités à 63 caractères.
+> Pour vos futurs environnements, donnez-leur un nom logique (demo, dev, integ, prod, etc). Le nom doit être court
+> parce qu'il est réutilisé dans les objets Kubernetes dont les noms sont limités à 63 caractères.
 
 > [!IMPORTANT]
 > Le choix d'un type d'environnement permet de filtrer les dimensionnements proposés. Pour rappel, nous avions défini à
@@ -101,11 +99,13 @@ Vous pouvez retrouver les déploiements dans l'onglet `Ressources` avec les dép
 - `Environnement cible` : **tuto** (ou le nom de votre environnement créé plus haut)
 - `Dépôt` : **demo-java-infra**
 - `Nom de la révision à déployer` : **tuto**
-- `Chemin du répertoire à déployer` : **laissez ce champ vide** (default `.`)
+- `Chemin du répertoire à déployer` : **laissez ce champ vide** (par défaut `.`)
 
 ▶️ Cliquez sur le bouton `Enregistrer` et attendez que le déploiement apparaisse dans la console.
 
 ![déploiement créé](./img/deploiement-cree.png)
+
+### ArgoCD
 
 ▶️ Depuis le menu `Services externes`, cliquez sur la tuile *ArgoCD DSO*. Authentifiez-vous en appuyant sur le bouton
 *login via Keycloak*.
@@ -115,8 +115,6 @@ Vous pouvez retrouver les déploiements dans l'onglet `Ressources` avec les dép
 > [!NOTE]
 > Par défaut, en accédant à ArgoCD depuis la console CPiN, un filtre sur le nom de votre application est déjà appliqué.
 > Celle-ci peut mettre quelques minutes à s'afficher le temps qu'elle soit créée.
-
-### ArgoCD
 
 Une fois connecté à ArgoCD, 4 applications sont visibles. Elles correspondent à votre infrastructure et votre stack
 d'observabilité. Vous devriez donc retrouver les applications suivantes :
@@ -136,8 +134,8 @@ dans le tuto sur l'observabilité à l'étape 6
 > environnement de type production est déployé.
 
 ▶️ Afin de vérifier les paramètres de notre application, choisissez votre application de type
-***[NOM_PROJET]-tuto-[ID]-demo-java-infra-[RANDOM]*** puis cliquez sur le bouton `Details` en haut à gauche. Ce menu
-présente les informations principales de l'application ArgoCD :
+***[NOM_PROJET]-[NOM_ENV]-[ID]-demo-java-infra-[RANDOM]*** puis cliquez sur le bouton `Details` en haut à gauche. Ce
+menu présente les informations principales de l'application ArgoCD :
 - Le cluster et le namespace de déploiement
 - Le dépôt Git associé (*REPO URL*)
 - La branche utilisée sur le dépôt (*TARGET REVISION*)
@@ -150,25 +148,24 @@ présente les informations principales de l'application ArgoCD :
 ![Namespace](./img/namespace-details.png)
 
 > [!NOTE]
-> Il n'est pas possible de modifier ces éléments depuis cette IHM ArgoCD. Pour modifier les éléments, il est nécessaire
-> de modifier le dépôt de code depuis la console CPiN.
+> Il n'est pas possible de modifier ces éléments depuis cette IHM ArgoCD. Pour les modifier, il faut le faire dans
+> votre déploiement dans la console CPiN.
 
 Les éléments à vérifier de façon générale sont :
-- La branche utilisée par défaut, il s'agit de la branche principale du dépôt, mais il est possible suivant le cas de
-modifier cette branche. Il est courant d'utiliser la branche develop ou dso du projet selon votre workflow Git. Il est
-nécessaire d'éditer cette information depuis la console CPiN pour remplacer *HEAD* par le nom de la branche à utiliser
-dans le champ ***Nom de la révision à déployer***. Dans notre exemple, nous utilisons la branche tuto.
-- Le répertoire dans lequel chercher les éléments d'infrastructure : Par défaut, la console CPiN prépositionne un
-répertoire *./* à la racine du projet. Si vous avez un fonctionnement différent, il faut également mettre à jour cette
-information dans la console CPiN et remplacer la valeur du champ ***Chemin du répertoire à déployer***.
+- La branche utilisée par défaut. Il est possible de la modifier dans le champ ***Nom de la révision à déployer***,
+dans la configuration de votre déploiement depuis la console CPiN. Il est même courant d'utiliser une branche dédiée
+dans le cadre d'un workflow Git spécifique. Dans notre exemple, nous utilisons la branche tuto.
+- Le répertoire dans lequel chercher les éléments d'infrastructure : par défaut, la console CPiN utilise le répertoire
+racine du projet `./`. Si vous avez un fonctionnement différent, il faut également le mettre à jour dans la console
+CPiN et remplacer la valeur du champ ***Chemin du répertoire à déployer*** au sein de votre déploiement.
 
 Puisque nous avons décoché la case `Synchronisation automatique` depuis la console CPiN, l'application devrait
 apparaitre dans un état *OutOfSync*.
 
 ![ArgoCD OutOfSync](./img/argocd-out-of-sync.png)
 
-▶️ Il est nécessaire de déployer l'application à la main. Pour cela, cliquez sur le bouton `SYNC` dans le menu haut puis
-`SYNCHRONIZE` pour déployer l'application.
+▶️ Il est nécessaire de déployer l'application à la main. Pour cela, cliquez sur le bouton `SYNC` dans le menu haut
+puis `SYNCHRONIZE` pour déployer l'application.
 
 ![ArgoCD sync](./img/argocd-sync.png)
 
@@ -243,7 +240,7 @@ fichier.
 ▶️ Une fois que le fichier est créé, *commit* puis *push* sur le dépôt GitLab, retournez sur la console CPiN et ouvrez
 votre déploiement dans l'onglet `Ressources`.
 
-▶️ Dans la section *Sources de valeurs (Helm)*, cliquez sur  `+ Ajouter une source de valeurs`.
+▶️ Dans la section *Sources de valeurs (Helm)*, cliquez sur `+ Ajouter une source de valeurs`.
 
 ![ajout source de valeurs](./img/ajout-source-de-valeurs.png)
 
