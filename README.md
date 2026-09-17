@@ -64,11 +64,13 @@ Afin de déployer l'application, il est nécessaire de créer un environnement d
 - `Zone` : **DSO** (sur l'environnement d'accélération, une seule zone est disponible)
 - `Type d'environnement` : **dev**
 - `Cluster` : **formation-app** (ce cluster est dédié aux exercices et peut être facilement purgé)
-- `Mémoire allouée` : 8
+- `Mémoire allouée` : 4
 - `CPU alloué` : 4
 - `GPU alloué` : 0
 - `Synchronisation automatique` : **décochez la case** (permet d'éviter de commencer à déployer le projet tant qu'il
 n'est pas complètement configuré)
+
+▶️ Cliquez sur le bouton `Ajouter l'environnement` et attendez que l'environnement apparaisse dans la console CPiN.
 
 > [!IMPORTANT]
 > Pour vos futurs environnements, donnez-leur un nom logique (demo, dev, integ, prod, etc). Le nom doit être court
@@ -78,8 +80,6 @@ n'est pas complètement configuré)
 > Le choix d'un type d'environnement permet de filtrer les dimensionnements proposés. Pour rappel, nous avions défini à
 > la création du projet, dans l'étape 1 de la formation, des valeurs de dimensionnement pour les environnements de
 > *hors-production* et de *production*.
-
-▶️ Cliquez sur le bouton `Ajouter l'environnement` et attendez que l'environnement apparaisse dans la console CPiN.
 
 ## Déploiement de l'application
 
@@ -259,38 +259,12 @@ appliqués.
 ### Vérification
 
 Une fois le déploiement terminé et opérationnel, le statut de votre application devrait apparaitre *Healthy* ainsi que
-tous les éléments de l'infrastructure 💚. Vous pouvez directement vous rendre sur l'URL configurée dans **ingress.host**
-mais vous pouvez également la retrouver sur ArgoCD via l'objet *ingress*.
+tous les éléments de l'infrastructure 💚. Vérifiez que votre application fonctionne correctement en ouvrant l'URL que
+vous avez configuré via l'objet **ingress** dans ArgoCD.
 
 ![ArgoCD Ingress](./img/argocd-ingress.png)
 
-Si tout est correctement configuré, la page devrait vous renvoyer la liste de personnes présentes dans la base de
-données au format JSON.
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Alice"
-  },
-  {
-    "id": 2,
-    "name": "Bob"
-  },
-  {
-    "id": 3,
-    "name": "Charles"
-  },
-  {
-    "id": 4,
-    "name": "Denis"
-  },
-  {
-    "id": 5,
-    "name": "Emily"
-  }
-]
-```
+![ArgoCD Ingress](./img/success-application.png)
 
 Bravo, vous avez terminé la partie déploiement de la formation CPiN !
 
