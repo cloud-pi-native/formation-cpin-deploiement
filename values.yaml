@@ -7,7 +7,6 @@ replicaCount: 1
 image:
   repository: harbor.dso.formation.numerique-interieur.fr/nom-projet/nom-image
   pullPolicy: Always
-  # Surcharge le tag de l'image, dont la valeur par défaut est l'appVersion du chart.
   tag: "tuto"
 
 imagePullSecrets: 
@@ -41,31 +40,24 @@ securityContext:
   capabilities:
     drop:
       - ALL
-  # La JVM a besoin d'écrire dans /tmp (répertoire de travail de Tomcat).
   readOnlyRootFilesystem: false
   seccompProfile:
     type: RuntimeDefault
 
-# L'application n'expose pas Actuator : les probes utilisent les endpoints applicatifs.
-# /api/demo/ ne consulte pas la base, /api/demo/demo la consulte.
-
-# Laisse à la JVM le temps de démarrer (jusqu'à 30 x 5s) avant les autres probes.
 startupProbe:
   httpGet:
     path: /api/demo/
     port: http
+  initialDelaySeconds: 15
   periodSeconds: 5
   failureThreshold: 30
 
-# Volontairement indépendante de PostgreSQL : une base indisponible ne doit pas
-# provoquer de redémarrages en boucle du conteneur applicatif.
 livenessProbe:
   httpGet:
     path: /api/demo/
     port: http
   periodSeconds: 10
 
-# Retire le pod du service tant qu'il ne peut pas servir de données.
 readinessProbe:
   httpGet:
     path: /api/demo/demo
@@ -76,8 +68,6 @@ postgres:
   fullnameOverride: postgres
 
   auth:
-    # Le mot de passe est fourni par le secret pg-secret (templates/secret.yaml),
-    # celui-là même que lit l'application dans son deployment.
     existingSecret: pg-secret
     secretKeys:
       passwordKey: "PG_PASSWORD"
