@@ -251,7 +251,7 @@ votre déploiement dans l'onglet `Ressources`.
 ▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
 et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications. Si votre application
 n'apparait pas dans l'état *OutOfSync*, patientez quelques secondes le temps que les paramètres de déploiement soient
-appliqués.
+appliqués ou activez la synchronisation automatique sur votre environnement.
 
 > [!TIP]
 > Pour activer la synchronisation automatique, vous pouvez aller dans les paramètres de votre environnement dans la
