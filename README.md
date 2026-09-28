@@ -203,7 +203,7 @@ branche `tuto` en haut à gauche. Ensuite, cliquez sur le bouton `+`>`New file`.
 ```yaml
 image:
   repository: harbor.dso.formation.numerique-interieur.fr/[NOM_PROJET]/[NOM_IMAGE]
-  tag: "tuto"
+  tag: "main"
 
 ingress:
   host: [NOM_PROJET].app.formation.numerique-interieur.fr
@@ -224,8 +224,9 @@ aura alors le format suivant :
 > *harbor.dso.formation.numerique-interieur.fr/**[NOM_PROJET]***/**[NOM_IMAGE]**
 
 ▶️ Pour connaitre le **tag** de votre image, allez sur Harbor depuis la console CPiN. Cliquez sur votre image Docker et
-retrouvez le tag dans la colonne *Tags*. Ce tag correspond généralement au nom de votre branche de déploiement. Pour le
-tutoriel, mettez : ***tuto***.
+retrouvez le tag dans la colonne *Tags*. Ce tag correspond généralement au nom de la branche sur laquelle a été
+construite l'image. Pour le tutoriel, mettez : ***main*** puisque notre image a été construite et poussée sur Harbor
+depuis la branche main.
 
 Enfin, sur l'environnement d'accélération, la génération des DNS et des certificats est automatiquement gérée en
 respectant les sous-domaines liés aux clusters. Pour plus d'informations, consultez la documentation
