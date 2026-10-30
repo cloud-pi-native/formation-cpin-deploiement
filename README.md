@@ -187,6 +187,13 @@ Les éléments en erreur apparaissent sous la forme d'un petit cœur brisé 💔
 détails du *POD* s'affiche, allez sur l'onglet `EVENTS`. À noter qu'il est également possible de consulter les logs
 des *PODS* sur l'onglet `LOGS` situé à côté.
 
+▶️ Pour la suite, afin de vous éviter des actions manuelles, réactivez la synchronisation automatique sur votre
+environnement 
+
+> [!TIP]
+> Pour activer la synchronisation automatique, vous pouvez aller dans les paramètres de votre environnement dans la
+> console.
+
 Pour corriger les erreurs, nous allons ajouter un fichier *values* avec les paramètres manquants dans le dépôt Git.
 
 > [!CAUTION]
@@ -247,15 +254,6 @@ votre déploiement dans l'onglet `Ressources`.
 
 ▶️ Ajoutez le fichier values que nous venons de créer en sélectionnant le type `Interne` et en remplissant le champ
 `Chemin du fichier de valeurs` avec ***values-demo.yaml***. Cliquez sur `Enregistrer`.
-
-▶️ Comme précédemment, la synchronisation automatique n'étant pas activée, retournez dans votre application sur ArgoCD
-et cliquez sur le bouton *SYNC* puis *SYNCHRONIZE* pour voir s'appliquer vos modifications. Si votre application
-n'apparait pas dans l'état *OutOfSync*, patientez quelques secondes le temps que les paramètres de déploiement soient
-appliqués ou activez la synchronisation automatique sur votre environnement.
-
-> [!TIP]
-> Pour activer la synchronisation automatique, vous pouvez aller dans les paramètres de votre environnement dans la
-> console.
 
 ### Vérification
 
