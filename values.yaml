@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: harbor.dso.formation.numerique-interieur.fr/nom-projet/nom-image
   pullPolicy: Always
-  tag: "tuto"
+  tag: "main"
 
 imagePullSecrets: 
   - name: "registry-pull-secret"
